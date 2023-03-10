@@ -75,9 +75,9 @@ contract RockPaperScissors {
     }
     uint winner;
     if (msg.sender == games[gameNumber].players[0]) {
-      winner = checkWinner(games[gameNumber].moves[0], MoveType(moveNumber));
-    }else {
       winner = checkWinner(MoveType(moveNumber), games[gameNumber].moves[1]);
+    }else {
+      winner = checkWinner(games[gameNumber].moves[0], MoveType(moveNumber));
     }
     bool sent;
     if (winner == 0) {
