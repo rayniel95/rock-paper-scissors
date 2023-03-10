@@ -83,20 +83,20 @@ contract RockPaperScissors {
     }
     bool sent;
     if (winner == 0) {
-      (sent,) = games[gameNumber].players[0].call{value: address(this).balance/2}("");
+      (sent,) = games[gameNumber].players[0].call{value: games[gameNumber].bet}("");
       require(sent, "Failed to send Ether to first player");
-      (sent,) = games[gameNumber].players[1].call{value: address(this).balance}("");
+      (sent,) = games[gameNumber].players[1].call{value: games[gameNumber].bet}("");
       require(sent, "Failed to send Ether to second player");
       emit GameComplete(address(0), gameNumber);
       return;
     }
     if (winner == 1) {
-      (sent,) = games[gameNumber].players[0].call{value: address(this).balance}("");
+      (sent,) = games[gameNumber].players[0].call{value: games[gameNumber].bet*2}("");
       require(sent, "Failed to send Ether to first player");
       emit GameComplete(games[gameNumber].players[0], gameNumber);
       return;
     }
-    (sent,) = games[gameNumber].players[1].call{value: address(this).balance}("");
+    (sent,) = games[gameNumber].players[1].call{value: games[gameNumber].bet*2}("");
     require(sent, "Failed to send Ether to second player");
     emit GameComplete(games[gameNumber].players[1], gameNumber);
   }
