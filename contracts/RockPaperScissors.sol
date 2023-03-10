@@ -9,7 +9,7 @@ contract RockPaperScissors {
   struct Game {
     address[2] players;
     uint bet;
-    MoveType move;
+    MoveType[2] moves;
   }
   enum MoveType {
     None,
@@ -26,7 +26,7 @@ contract RockPaperScissors {
    */
   function createGame(address payable participant) public payable {
     require(msg.value > 0, "The bet must be a positive value");
-    games.push(Game([msg.sender, participant], msg.value, 0));
+    games.push(Game([msg.sender, participant], msg.value, [MoveType.None, MoveType.None]));
     emit GameCreated(msg.sender, games.length, msg.value);
   }
   
@@ -64,6 +64,19 @@ contract RockPaperScissors {
     require(moveNumber > 0, "Move number must be grather than zero");
     require(moveNumber < 4, "Move number must be less than four");
 
+    if (games[gameNumber].moves[0] == MoveType.None && games[gameNumber].moves[1] == MoveType.None) {
+      
+    }
+    if (games[gameNumber].move != MoveType.None) {
+      if (checkWinner()) {
+        
+      }      
+    }
 
+  }
+
+  function checkWinner(MoveType first, MoveType second) internal pure returns (uint) {
+    uint8[9] memory result = [0, 2, 1, 1, 0, 2, 2, 1, 0];
+    return result[(uint(first)-1)*3+(uint(second)-1)];
   }
 }
