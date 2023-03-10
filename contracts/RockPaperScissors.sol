@@ -63,6 +63,7 @@ contract RockPaperScissors {
   function makeMove(uint gameNumber, uint moveNumber) public { 
     require(moveNumber > 0, "Move number must be grather than zero");
     require(moveNumber < 4, "Move number must be less than four");
+    require(msg.sender == games[gameNumber].players[1] || msg.sender == games[gameNumber].players[0], "You can not participate");
 
     if (games[gameNumber].moves[0] == MoveType.None && games[gameNumber].moves[1] == MoveType.None) {
       
