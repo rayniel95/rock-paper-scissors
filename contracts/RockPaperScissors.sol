@@ -32,7 +32,21 @@ contract RockPaperScissors {
    * @param gameNumber {uint} - Corresponds to the gameNumber provided by the GameCreated event
    */
   function joinGame(uint gameNumber) public payable {
-  
+    require(msg.sender == games[gameNumber].players[1], "You can not participate");
+    require(msg.value >= games[gameNumber].bet, "You must send a value grether or equal of the initial bet");
+    
+    if (msg.value > games[gameNumber].bet) {
+        (bool success,) = msg.sender.call{value: msg.value - games[gameNumber].bet}("");
+        require(success,"Failed to send Eth!");
+    }
+    address[] memory players = new address[](2);
+    // TODO - will be a good idea to add a library for casting from fixed 
+    // array to dynamic one
+    for (uint index = 0; index < 2; index++) {
+        players[index] = games[gameNumber].players[index];
+    }
+
+    emit GameStarted(players, gameNumber);
   }
   
   /**
