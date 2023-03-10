@@ -66,14 +66,37 @@ contract RockPaperScissors {
     require(msg.sender == games[gameNumber].players[1] || msg.sender == games[gameNumber].players[0], "You can not participate");
 
     if (games[gameNumber].moves[0] == MoveType.None && games[gameNumber].moves[1] == MoveType.None) {
-      
+      if (msg.sender == games[gameNumber].players[0]) {
+        games[gameNumber].moves[0] = MoveType(moveNumber);
+        return;
+      }
+      games[gameNumber].moves[1] = MoveType(moveNumber);
+      return;
     }
-    if (games[gameNumber].move != MoveType.None) {
-      if (checkWinner()) {
-        
-      }      
+    uint winner;
+    if (msg.sender == games[gameNumber].players[0]) {
+      winner = checkWinner(games[gameNumber].moves[0], MoveType(moveNumber));
+    }else {
+      winner = checkWinner(MoveType(moveNumber), games[gameNumber].moves[1]);
     }
-
+    bool sent;
+    if (winner == 0) {
+      (sent,) = games[gameNumber].players[0].call{value: address(this).balance/2}("");
+      require(sent, "Failed to send Ether to first player");
+      (sent,) = games[gameNumber].players[1].call{value: address(this).balance}("");
+      require(sent, "Failed to send Ether to second player");
+      emit GameComplete(address(0), gameNumber);
+      return;
+    }
+    if (winner == 1) {
+      (sent,) = games[gameNumber].players[0].call{value: address(this).balance}("");
+      require(sent, "Failed to send Ether to first player");
+      emit GameComplete(games[gameNumber].players[0], gameNumber);
+      return;
+    }
+    (sent,) = games[gameNumber].players[1].call{value: address(this).balance}("");
+    require(sent, "Failed to send Ether to second player");
+    emit GameComplete(games[gameNumber].players[1], gameNumber);
   }
 
   function checkWinner(MoveType first, MoveType second) internal pure returns (uint) {
