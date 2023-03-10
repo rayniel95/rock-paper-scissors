@@ -10,6 +10,7 @@ contract RockPaperScissors {
     address[2] players;
     uint bet;
     MoveType[2] moves;
+    bool started;
   }
   enum MoveType {
     None,
@@ -26,7 +27,7 @@ contract RockPaperScissors {
    */
   function createGame(address payable participant) public payable {
     require(msg.value > 0, "The bet must be a positive value");
-    games.push(Game([msg.sender, participant], msg.value, [MoveType.None, MoveType.None]));
+    games.push(Game([msg.sender, participant], msg.value, [MoveType.None, MoveType.None], false));
     emit GameCreated(msg.sender, games.length-1, msg.value);
   }
   
@@ -40,8 +41,10 @@ contract RockPaperScissors {
   function joinGame(uint gameNumber) public payable {
     require(msg.sender == games[gameNumber].players[1], "You can not participate");
     require(msg.value >= games[gameNumber].bet, "You must send a value grether or equal of the initial bet");
+    require(!games[gameNumber].started, "You can not rejoin a game");
     require(gameNumber < games.length, "You must to join a valid game");
 
+    games[gameNumber].started = true;
     if (msg.value > games[gameNumber].bet) {
         (bool success,) = msg.sender.call{value: msg.value - games[gameNumber].bet}("");
         require(success,"Failed to send Eth!");
@@ -65,6 +68,7 @@ contract RockPaperScissors {
     require(moveNumber > 0, "Move number must be grather than zero");
     require(moveNumber < 4, "Move number must be less than four");
     require(gameNumber < games.length, "You must to join a valid game");
+    require(games[gameNumber].started, "You must move in a started game");
     require(msg.sender == games[gameNumber].players[1] || msg.sender == games[gameNumber].players[0], "You can not participate");
 
     if (games[gameNumber].moves[0] == MoveType.None && games[gameNumber].moves[1] == MoveType.None) {
