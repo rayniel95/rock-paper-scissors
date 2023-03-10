@@ -27,7 +27,7 @@ contract RockPaperScissors {
   function createGame(address payable participant) public payable {
     require(msg.value > 0, "The bet must be a positive value");
     games.push(Game([msg.sender, participant], msg.value, [MoveType.None, MoveType.None]));
-    emit GameCreated(msg.sender, games.length, msg.value);
+    emit GameCreated(msg.sender, games.length-1, msg.value);
   }
   
   /**
